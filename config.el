@@ -29,16 +29,18 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setq org-directory "~/org-notes/")
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
+(setq display-line-numbers-type 'relative)
 
 (setq doom-load-envvars-file "~/.config/doom.d/.local/env")
 
+;; Ctrl-s active swiper search in the current buffer
 (global-set-key (kbd "C-s") #'swiper)
 
+;; lsp-ui-doc mode enable and custome lsp-ui-doc customization
 (add-hook! 'lsp-ui-mode-hook #'lsp-ui-doc-mode)
 (after! lsp-ui
   (setq!
@@ -50,10 +52,39 @@
    )
   )
 
-;; (map!
-;;       :map magit-mode-map
-;;       ", c" #'magit-commit
-;;       "s"  #'magit-status)
+;; remap localleader key
+(after! evil
+  (setq! doom-localleader-key ",")
+  )
+
+
+;;
+(defun tinysong/insert-chrome-current-tab-title ()
+  (interactive)
+  (insert (retrieve-chrome-current-table-title))
+  )
+
+
+(defun retrieve-chrome-current-table-title ()
+  "Get the tile of chrome first window"
+  (interactive)
+  (let
+      ((title (do-applescript
+               (concat
+                "set frontmostApplication to path to frontmost application\n"
+                "tell application \"Google Chrome\"\n"
+                "set theTitle to get title of active tab of first window\n"
+                "set theResult to (get theTitle) \n"
+                "end tell\n"
+                "activate application (frontmostApplication as text)\n"
+                "set links to {}\n"
+                "copy theResult to the end of links\n"
+                "return links as string\n"
+                ))))
+    (format "%s" title))
+  )
+
+
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
