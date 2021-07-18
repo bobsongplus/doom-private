@@ -6,8 +6,8 @@
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
-(setq user-full-name "John Doe"
-      user-mail-address "john@doe.com")
+(setq user-full-name "song"
+      user-mail-address "tinysong1226@gmail.com")
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
@@ -39,6 +39,21 @@
 
 (global-set-key (kbd "C-s") #'swiper)
 
+(add-hook! 'lsp-ui-mode-hook #'lsp-ui-doc-mode)
+(after! lsp-ui
+  (setq!
+  lsp-ui-doc-position 'top
+  lsp-ui-doc-show-with-mouse t
+  lsp-ui-doc-max-height 15
+  lsp-ui-doc-max-width 160
+  lsp-ui-doc-show-with-cursor t
+   )
+  )
+
+;; (map!
+;;       :map magit-mode-map
+;;       ", c" #'magit-commit
+;;       "s"  #'magit-status)
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
