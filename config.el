@@ -46,8 +46,8 @@
   (setq!
   lsp-ui-doc-position 'top
   lsp-ui-doc-show-with-mouse t
-  lsp-ui-doc-max-height 15
-  lsp-ui-doc-max-width 160
+  lsp-ui-doc-max-height 20
+  lsp-ui-doc-max-width 200
   lsp-ui-doc-show-with-cursor t
    )
   )
@@ -57,6 +57,8 @@
   (setq! doom-localleader-key ",")
   )
 
+;; fullscreen doom-emacs when start-up
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
 ;;
 (defun tinysong/insert-chrome-current-tab-title ()
@@ -85,6 +87,17 @@
   )
 
 
+(map!
+  "C-c y" #'youdao-dictionary-search-at-point-tooltip)
+
+
+;; custom magit keybinding
+(map! :leader
+;;; <leader> g --- git/version control
+      (:prefix-map ("g" . "git")
+       :desc "Magit status"              "s"   #'magit-status
+       )
+      )
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
