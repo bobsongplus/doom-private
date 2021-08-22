@@ -99,6 +99,45 @@
        )
       )
 
+
+;; info color: This makes manual pages nicer to look at by adding variable pitch
+;; fontification and colouring
+(use-package! info-colors
+  :commands (info-colors-fontify-node))
+
+(add-hook 'Info-selection-hook 'info-colors-fontify-node)
+
+;; witter’s emojis look nicer than emoji-one. Other than that, this is pretty great OOTB 😀.
+(setq emojify-emoji-set "twemoji-v2")
+
+
+;; show kebingding in the mode line, call by keycast-mode
+(use-package! keycast
+  :commands keycast-mode
+  :config
+  (define-minor-mode keycast-mode
+    "Show current command and its key binding in the mode line."
+    :global t
+    (if keycast-mode
+        (progn
+          (add-hook 'pre-command-hook 'keycast--update t)
+          (add-to-list 'global-mode-string '("" mode-line-keycast " ")))
+      (remove-hook 'pre-command-hook 'keycast--update)
+      (setq global-mode-string (remove '("" mode-line-keycast " ") global-mode-string))))
+  (custom-set-faces!
+    '(keycast-command :inherit doom-modeline-debug
+                      :height 0.9)
+    '(keycast-key :inherit custom-modified
+                  :height 1.1
+                  :weight bold)))
+
+;; (after! org
+;;   <<org-conf>>
+;; )
+
+
+(setq org-roam-directory (file-truename "~/Documents/org-roam"))
+
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
 ;; - `load!' for loading external *.el files relative to this one
