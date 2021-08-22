@@ -88,7 +88,9 @@
 
 
 (map!
-  "C-c y" #'youdao-dictionary-search-at-point-tooltip)
+ "C-c y" #'youdao-dictionary-search-at-point-tooltip
+ "C-c t" #'hl-todo-insert
+ )
 
 
 ;; custom magit keybinding
@@ -131,12 +133,93 @@
                   :height 1.1
                   :weight bold)))
 
+
+
+
+
+;; company for org roam
+(use-package company-org-roam
+  :after org-roam
+  :config
+  (set-company-backend! 'org-mode '(company-org-roam company-yasnippet company-dabbrev)))
+
+(use-package org-roam-bibtex
+  :after (org-roam)
+  :hook (org-roam-mode . org-roam-bibtex-mode)
+  :config
+  (setq org-roam-bibtex-preformat-keywords
+   '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
+  (setq orb-templates
+        '(("r" "ref" plain (function org-roam-capture--get-point)
+           ""
+           :file-name "${slug}"
+           :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
+
+- tags ::
+- keywords :: ${keywords}
+
+\n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
+
+           :unnarrowed t))))
+
+(setq
+   org_notes (concat (getenv "HOME") "/Documents/org-roam")
+   zot_bib (concat (getenv "HOME") "/GDrive/zotLib.bib")
+   org-directory org_notes
+   deft-directory org_notes
+   org-roam-directory org_notes
+   )
+
+;; enhancement org-noter
+;; HACK: more informatin org-noter: https://github.com/weirdNox/org-noter
+(use-package org-noter
+  :after (:any org pdf-view)
+  :config
+  (setq
+   ;; The WM can handle splits
+   org-noter-notes-window-location 'other-frame
+   ;; Please stop opening frames
+   org-noter-always-create-frame nil
+   ;; I want to see the whole file
+   org-noter-hide-other nil
+   ;; Everything is relative to the main notes file
+   org-noter-notes-search-path (list org_notes)
+   )
+  )
+;; TODO: org-protocol
+;; TODO: crawls content send to emacs by org-protocol
+;; TODO: optimize org-capture
+(after! org-capture
+  ;; Firefox and Chrome
+  (add-to-list 'org-capture-templates
+               '("P" "Protocol" entry   ; key, name, type
+                 (file+headline +org-capture-notes-file "Inbox") ; target
+                 "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?"
+                 :prepend t             ; properties
+                 :kill-buffer t))
+  (add-to-list 'org-capture-templates
+               '("L" "Protocol Link" entry
+                 (file+headline +org-capture-notes-file "Inbox")
+                 "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n"
+                 :prepend t
+                 :kill-buffer t))
+  )
+;; TODO: org hugo setting
+;; TODO: org brain
 ;; (after! org
 ;;   <<org-conf>>
 ;; )
 
+;; pdf tools
+;; REVIEW  https://emacs.stackexchange.com/questions/13314/install-pdf-tools-on-emacs-macosx
+(use-package pdf-tools
+  :ensure t
+  :config
+  (custom-set-variables
+   '(pdf-tools-handle-upgrades nil))    ; Use brew upgrade pdf-tools instead.
+  (setq pdf-info-epdfinfo-program "~/.config/epdfinfo"))
+     (pdf-tools-install)
 
-(setq org-roam-directory (file-truename "~/Documents/org-roam"))
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
