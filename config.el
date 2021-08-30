@@ -7,7 +7,10 @@
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
 (setq user-full-name "song"
-      user-mail-address "tinysong1226@gmail.com")
+      user-mail-address "tinysong1226@gmail.com"
+      )
+
+(setq doom-incremental-load-immediately nil)
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
@@ -98,24 +101,26 @@
 ;;; <leader> g --- git/version control
       (:prefix-map ("g" . "git")
        :desc "Magit status"              "s"   #'magit-status
+       :desc "Magit log"              "l"   #'magit-log
+       :desc "Magit rebase"              "r"   #'magit-rebase
+       :desc "magit commit amend" "a" #'magit-commit-amend
        )
       )
 
 
-;; info color: This makes manual pages nicer to look at by adding variable pitch
-;; fontification and colouring
+;; ;; info color: This makes manual pages nicer to look at by adding variable pitch
+;; ;; fontification and colouring
 (use-package! info-colors
   :commands (info-colors-fontify-node))
 
-(add-hook 'Info-selection-hook 'info-colors-fontify-node)
+;; (add-hook 'Info-selection-hook 'info-colors-fontify-node)
 
-;; witter’s emojis look nicer than emoji-one. Other than that, this is pretty great OOTB 😀.
+;; ;; witter’s emojis look nicer than emoji-one. Other than that, this is pretty great OOTB 😀.
 (setq emojify-emoji-set "twemoji-v2")
 
 
-;; show kebingding in the mode line, call by keycast-mode
+;; ;; show kebingding in the mode line, call by keycast-mode
 (use-package! keycast
-  :commands keycast-mode
   :config
   (define-minor-mode keycast-mode
     "Show current command and its key binding in the mode line."
@@ -131,47 +136,21 @@
                       :height 0.9)
     '(keycast-key :inherit custom-modified
                   :height 1.1
-                  :weight bold)))
+                  :weight bold))
+  (keycast-mode))
 
 
 
-
-
-;; company for org roam
-(use-package company-org-roam
-  :after org-roam
-  :config
-  (set-company-backend! 'org-mode '(company-org-roam company-yasnippet company-dabbrev)))
-
-(use-package org-roam-bibtex
-  :after (org-roam)
-  :hook (org-roam-mode . org-roam-bibtex-mode)
-  :config
-  (setq org-roam-bibtex-preformat-keywords
-   '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
-  (setq orb-templates
-        '(("r" "ref" plain (function org-roam-capture--get-point)
-           ""
-           :file-name "${slug}"
-           :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
-
-- tags ::
-- keywords :: ${keywords}
-
-\n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
-
-           :unnarrowed t))))
 
 (setq
    org_notes (concat (getenv "HOME") "/Documents/org-roam")
-   zot_bib (concat (getenv "HOME") "/GDrive/zotLib.bib")
    org-directory org_notes
    deft-directory org_notes
    org-roam-directory org_notes
    )
 
-;; enhancement org-noter
-;; HACK: more informatin org-noter: https://github.com/weirdNox/org-noter
+;; ;; enhancement org-noter
+;; ;; HACK: more informatin org-noter: https://github.com/weirdNox/org-noter
 (use-package org-noter
   :after (:any org pdf-view)
   :config
@@ -186,9 +165,31 @@
    org-noter-notes-search-path (list org_notes)
    )
   )
-;; TODO: org-protocol
-;; TODO: crawls content send to emacs by org-protocol
-;; TODO: optimize org-capture
+
+;; (use-package! websocket
+;;     :after org-roam)
+
+(use-package! org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+
+;; ;; I like short names
+;; (general-evil-setup t)
+;; ;; Stop telling me things begin with non-prefix keys
+;; (general-auto-unbind-keys)
+
+
+;; ;; TODO: org-protocol
+;; ;; TODO: crawls content send to emacs by org-protocol
+;; ;; TODO: optimize org-capture
 (after! org-capture
   ;; Firefox and Chrome
   (add-to-list 'org-capture-templates
@@ -204,36 +205,195 @@
                  :prepend t
                  :kill-buffer t))
   )
+
+(map! :localleader
+      :map markdown-mode-map
+      :prefix ("i" . "Insert")
+      :desc "Blockquote"    "q" 'markdown-insert-blockquote
+      :desc "Bold"          "b" 'markdown-insert-bold
+      :desc "Code"          "c" 'markdown-insert-code
+      :desc "Emphasis"      "e" 'markdown-insert-italic
+      :desc "Footnote"      "f" 'markdown-insert-footnote
+      :desc "Code Block"    "s" 'markdown-insert-gfm-code-block
+      :desc "Image"         "i" 'markdown-insert-image
+      :desc "Link"          "l" 'markdown-insert-link
+      :desc "List Item"     "n" 'markdown-insert-list-item
+      :desc "Pre"           "p" 'markdown-insert-pre
+      (:prefix ("h" . "Headings")
+        :desc "One"   "1" 'markdown-insert-atx-1
+        :desc "Two"   "2" 'markdown-insert-atx-2
+        :desc "Three" "3" 'markdown-insert-atx-3
+        :desc "Four"  "4" 'markdown-insert-atx-4
+        :desc "Five"  "5" 'markdown-insert-atx-5
+        :desc "Six"   "6" 'markdown-insert-atx-6))
+
+
+;; ;; These bindings should probably be after org-noter is loaded.
+(map! :localleader
+      :map (org-mode-map pdf-view-mode-map)
+      (:prefix ("o" . "Org")
+       (:prefix ("n" . "Noter")
+        :desc "Noter" "n" 'org-noter
+        )))
+
+(after! org (map! :localleader
+      :map org-mode-map
+      :desc "Eval Block" "e" 'ober-eval-block-in-repl
+      (:prefix "o"
+        :desc "Tags" "t" 'org-set-tags
+        :desc "Roam Bibtex" "b" 'orb-note-actions
+        (:prefix ("p" . "Properties")
+          :desc "Set" "s" 'org-set-property
+          :desc "Delete" "d" 'org-delete-property
+          :desc "Actions" "a" 'org-property-action
+          )
+        )
+      (:prefix ("i" . "Insert")
+       :desc "Link/Image" "l" 'org-insert-link
+       :desc "Item" "o" 'org-toggle-item
+       :desc "Citation" "c" 'org-ref-helm-insert-cite-link
+       :desc "Footnote" "f" 'org-footnote-action
+       :desc "Table" "t" 'org-table-create-or-convert-from-region
+       :desc "Screenshot" "s" 'org-download-screenshot
+       (:prefix ("b" . "Block")
+        :desc "insert" "b" 'org-insert-src-block
+        :desc "edit" "e" 'org-edit-src-code
+        )
+       (:prefix ("h" . "Headings")
+        :desc "Normal" "h" 'org-insert-heading
+        :desc "Todo" "t" 'org-insert-todo-heading
+        (:prefix ("s" . "Subheadings")
+         :desc "Normal" "s" 'org-insert-subheading
+         :desc "Todo" "t" 'org-insert-todo-subheading
+         )
+        )
+       (:prefix ("e" . "Exports")
+        :desc "Dispatch" "d" 'org-export-dispatch
+        )
+       )
+      )
+  )
+
+(after! pdf-view
+ ;; open pdfs scaled to fit page
+ (setq-default pdf-view-display-size 'fit-width)
+ (add-hook! 'pdf-view-mode-hook (evil-colemak-basics-mode -1))
+ ;; automatically annotate highlights
+ (setq pdf-annot-activate-created-annotations t
+       pdf-view-resize-factor 1.1)
+  ;; faster motion
+(map!
+  :map pdf-view-mode-map
+  :n "g g"          #'pdf-view-first-page
+  :n "G"            #'pdf-view-last-page
+  :n "N"            #'pdf-view-next-page-command
+  :n "E"            #'pdf-view-previous-page-command
+  :n "e"            #'evil-collection-pdf-view-previous-line-or-previous-page
+  :n "n"            #'evil-collection-pdf-view-next-line-or-next-page
+  :localleader
+  (:prefix "o"
+   (:prefix "n"
+    :desc "Insert" "i" 'org-noter-insert-note
+    ))
+))
+
+;; I like having the date on my TODO items.
+(setq org-log-done "time"
+      org-log-done-with-time 't)
+
+;; This controls what is used to open links in org documents.
+;; Since there are only a few defaults defined, I am just prepending them to my
+;; changes instead of dealing with append and stuff.
+(setq org-file-apps
+  '((auto-mode . emacs)
+    ("\\.mm\\'" . default)
+    ("\\.x?html?\\'" . default)
+    ("\\.pdf\\'" . default)
+    ("\\.png\\'" . viewnior)
+    ("\\.jpg\\'" . viewnior)
+    ("\\.svg\\'" . viewnior)
+    ))
+
+;; ;; enable word-wrap in C/C++/ObjC/Java
+(add-hook! 'markdown-mode-hook #'+word-wrap-mode)
+(add-hook! 'text-mode-hook #'+word-wrap-mode)
+(add-hook! 'tex-mode-hook #'+word-wrap-mode)
+
+
 ;; TODO: org hugo setting
-;; TODO: org brain
-;; (after! org
-;;   <<org-conf>>
-;; )
+(setq org-hugo-auto-set-lastmod 't
+      org-hugo-section "posts"
+      org-hugo-suppress-lastmod-period 43200.0
+      org-hugo-export-creator-string "Emacs 28.0.50 (Org mode 9.5 + ox-hugo + song)"
+      )
 
-;; pdf tools
-;; REVIEW  https://emacs.stackexchange.com/questions/13314/install-pdf-tools-on-emacs-macosx
-(use-package pdf-tools
-  :ensure t
+;; view pdf  in dark-mode
+(use-package pdf-view
+  :hook (pdf-tools-enabled . pdf-view-midnight-minor-mode)
+  :hook (pdf-tools-enabled . hide-mode-line-mode)
   :config
-  (custom-set-variables
-   '(pdf-tools-handle-upgrades nil))    ; Use brew upgrade pdf-tools instead.
-  (setq pdf-info-epdfinfo-program "~/.config/epdfinfo"))
-     (pdf-tools-install)
+  (setq pdf-view-midnight-colors '("#ABB2BF" . "#282C35")))
 
+;; ;; Actually start using templates
+(after! org-capture
+  ;; Firefox
+  (add-to-list 'org-capture-templates
+               '("P" "Protocol" entry
+                 (file+headline +org-capture-notes-file "Inbox")
+                 "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?"
+                 :prepend t
+                 :kill-buffer t))
+  (add-to-list 'org-capture-templates
+               '("L" "Protocol Link" entry
+                 (file+headline +org-capture-notes-file "Inbox")
+                 "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n"
+                 :prepend t
+                 :kill-buffer t))
+  ;; Misc
+  (add-to-list 'org-capture-templates
+               '("a"                                         ; key
+                 "Article"                                   ; name
+                 entry                                       ; type
+                 (file+headline +org-capture-notes-file "Article") ; target
+                 "* %^{Title} %(org-set-tags)  :article: \n:PROPERTIES:\n:Created: %U\n:Linked: %a\n:END:\n%i\nBrief description:\n%?" ; template
+                 :prepend t             ; properties
+                 :empty-lines 1         ; properties
+                 :created t             ; properties
+                 ))
+  )
+;; (setq org-roam-ref-capture-templates
+;;         '(("r" "ref" plain (function org-roam--capture-get-point)
+;;            "%?"
+;;            :file-name "websites/${slug}"
+;;            :head "#+SETUPFILE:./hugo_setup.org
+;; #+ROAM_KEY: ${ref}
+;; #+HUGO_SLUG: ${slug}
+;; #+TITLE: ${title}")
+;; ;; TODO: org brain
+;; ;; (after! org
+;; ;;   <<org-conf>>
+;; ;; )
 
-;; Here are some additional functions/macros that could help you configure Doom:
-;;
-;; - `load!' for loading external *.el files relative to this one
-;; - `use-package!' for configuring packages
-;; - `after!' for running code after a package has loaded
-;; - `add-load-path!' for adding directories to the `load-path', relative to
-;;   this file. Emacs searches the `load-path' when you load packages with
-;;   `require' or `use-package'.
-;; - `map!' for binding new keys
-;;
-;; To get information about any of these functions/macros, move the cursor over
-;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
-;; This will open documentation for it, including demos of how they are used.
-;;
-;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
-;; they are implemented.
+;; ;; http://wenshanren.org/?p=327
+;; ;; change it to helm
+(defun org-insert-src-block (src-code-type)
+  "Insert a `SRC-CODE-TYPE' type source code block in org-mode."
+  (interactive
+   (let ((src-code-types
+          '("emacs-lisp" "python" "C" "sh" "java" "js" "clojure" "C++" "css"
+            "calc" "asymptote" "dot" "gnuplot" "ledger" "lilypond" "mscgen"
+            "octave" "oz" "plantuml" "R" "sass" "screen" "sql" "awk" "ditaa"
+            "haskell" "latex" "lisp" "matlab" "ocaml" "org" "perl" "ruby"
+            "scheme" "sqlite" "yaml" "go")))
+     (list (ido-completing-read "Source code type: " src-code-types))))
+  (progn
+    (newline-and-indent)
+    (insert (format "#+BEGIN_SRC %s\n" src-code-type))
+    (newline-and-indent)
+    (insert "#+END_SRC\n")
+    (previous-line 2)
+    (org-edit-src-code)))
+
+;; ;; using goimports instead gofmt
+;; (setq! gofmt-command "gofmt")
+;; ;; REVIEW org capture https://mediaonfire.com/blog/2017_07_21_org_protocol_firefox.html

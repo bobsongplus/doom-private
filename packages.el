@@ -52,8 +52,121 @@
 ;; youdao translate
 (package! youdao-dictionary)
 
-;; info colors
-(package! info-colors :pin "47ee73cc19b1049eef32c9f3e264ea7ef2aaf8a5")
+;; ;; info colors
+;; (package! info-colors :pin "47ee73cc19b1049eef32c9f3e264ea7ef2aaf8a5")
 
 
 (package! keycast :pin "04ba7519f34421c235bac458f0192c130f732f12")
+
+;; snippets hlissner
+(use-package! doom-snippets
+  :after yasnippet)
+; AndreaCrotti
+(use-package! yasnippet-snippets
+  :after yasnippet)
+
+;; ;; REVIEW Reference: https://dotdoom.rgoswami.me/config.html#org8ed0901
+
+
+;; From https://github.com/poligen/dotfiles/blob/25785810f9bf98f6eec93e400c686a4ad65ac310/doom.d/config.el
+;; My customized org-download to incorporate flameshot gui Workaround to setup flameshot, which enables annotation.
+;; In flameshot, set filename as "screenshot", and the command as "flameshot gui -p /tmp", so that we always ends up
+;; with /tmp/screenshot.png. Nullify org-download-screenshot-method by setting it to `echo', so that essentially we
+;; are only calling (org-download-image org-download-screenshot-file).
+(defun hz-org-download-screenshot ()
+  "Capture screenshot and insert the resulting file.
+The screenshot tool is determined by `org-download-screenshot-method'."
+  (interactive)
+  (let ((tmp-file "/tmp/screenshot.png"))
+    (delete-file tmp-file)
+    (call-process-shell-command "flameshot gui -p /tmp/")
+    ;; Because flameshot exit immediately, keep polling to check file existence
+    (while (not (file-exists-p tmp-file))
+      (sleep-for 2))
+    (org-download-image tmp-file)))
+
+(use-package! org-download
+  :after org
+  :config
+  (setq-default org-download-image-dir "./images/"
+                ;; org-download-screenshot-method "flameshot gui --raw > %s"
+                org-download-delete-image-after-download t
+                org-download-method 'directory
+                org-download-heading-lvl 1
+                org-download-screenshot-file "/tmp/screenshot.png"
+                )
+  (cond (IS-LINUX (setq-default org-download-screenshot-method "xclip -selection clipboard -t image/png -o > %s"))
+        (IS-MAC (setq-default org-download-screenshot-method "screencapture -i %s"))))
+
+
+;; (use-package! org-drill
+;;   :after org)
+
+;; ;; NOTE citeproc-org: CSL-based export has recently been merged into Org's master branch  (2021-08-01)
+(after! ox-hugo
+  (use-package! citeproc-org
+    :config
+    (citeproc-org-setup)
+    (setq citeproc-org-org-bib-header "* References\n")
+    )
+  )
+
+(after! citeproc-org
+  (defun hz/min-headline-level ()
+    (--> (org-element-parse-buffer)
+         (org-element-map it 'headline (apply-partially #'org-element-property :level))
+         (or it '(0))
+         (-min it)))
+
+  (defadvice! hz/citeproc-org-render-references (orig &rest args)
+    :around 'citeproc-org-render-references
+    (let* ((minlevel (hz/min-headline-level))
+           (totallevel (max 1 minlevel))
+           (citeproc-org-org-bib-header (concat (make-string totallevel ?*)
+                                                (string-trim-left citeproc-org-org-bib-header "\\**"))))
+      (apply orig args))))
+
+
+;; ;; Misc Highlighting
+;; (use-package! vimrc-mode
+;;   :mode "\\.vimrc\\'")
+
+;; ;; TODO org-noter
+(use-package! org-noter
+  :after (:any org pdf-view)
+  :config
+  (setq
+   ;; The WM can handle splits
+   org-noter-notes-window-location 'other-frame
+   ;; Please stop opening frames
+   org-noter-always-create-frame nil
+   ;; I want to see the whole file
+   org-noter-hide-other nil
+   ;; Everything is relative to the rclone mega
+   org-noter-notes-search-path (list org_notes)
+   )
+  )
+
+;; org roam ui just fot roam2
+(package! websocket)
+(package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
+
+
+(package! org-protocol-capture-html
+  :recipe (:host github
+           :repo "alphapapa/org-protocol-capture-html"))
+
+
+(package! org-ref)
+
+(package! org-mind-map
+  :recipe (:host github
+            :repo "theodorewiles/org-mind-map"))
+
+;; org google calendar
+(package! org-gcal)
+
+;; This needs to be installed specially, https://github.com/alphapapa/org-protocol-capture-html
+(package! org-protocol-capture-html
+  :recipe (:host github
+           :repo "alphapapa/org-protocol-capture-html"))

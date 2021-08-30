@@ -23,7 +23,9 @@
        company ; the ultimate code completion backend
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       ivy                              ; a search engine for love and life
+       (ivy
+        +prescient
+        +icons)                              ; a search engine for love and life
 
        :ui
        deft              ; notational velocity for Emacs
@@ -169,7 +171,7 @@
        ;;rest              ; Emacs as a REST client
        ;;rst               ; ReST in peace
        ;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-       rust   ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       ( rust +lsp)   ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
        ;;(scheme +guile)   ; a fully conniving family of lisps
        sh     ; she sells {ba,z,fi}sh shells on the C xor
