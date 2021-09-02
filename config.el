@@ -63,7 +63,44 @@
 ;; fullscreen doom-emacs when start-up
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
-;;
+
+(defun tinysong/insert-chrome-current-tab-url()
+  "Get the URL of the active tab of the first window"
+  (interactive)
+  (insert (retrieve-chrome-current-tab-url)))
+;; execute macOS AppleScript
+(defun retrieve-chrome-current-tab-url()
+  "Get the URL of the active tab of the first window"
+  (interactive)
+  (let ((result (do-applescript
+                 (concat
+                  "set frontmostApplication to path to frontmost application\n"
+                  "tell application \"Google Chrome\"\n"
+                  "	set theUrl to get URL of active tab of first window\n"
+                  "	set theResult to (get theUrl) \n"
+                  "end tell\n"
+                  "activate application (frontmostApplication as text)\n"
+                  "set links to {}\n"
+                  "copy theResult to the end of links\n"
+                  "return links as string\n")))
+        (title (do-applescript
+                (concat
+                 "set frontmostApplication to path to frontmost application\n"
+                 "tell application \"Google Chrome\"\n"
+                 "set theTitle to get title of active tab of first window\n"
+                 "set theResult to (get theTitle) \n"
+                 "end tell\n"
+                 "activate application (frontmostApplication as text)\n"
+                 "set links to {}\n"
+                 "copy theResult to the end of links\n"
+                 "return links as string\n"
+                 ))))
+    (message "%s" result)
+    (message "%s" title)
+    (format "[[%s][%s]]" (s-chop-suffix "\"" (s-chop-prefix "\"" result)) title)))
+
+
+;; retrieve chrom curent table title
 (defun tinysong/insert-chrome-current-tab-title ()
   (interactive)
   (insert (retrieve-chrome-current-table-title))
@@ -91,10 +128,8 @@
 
 
 (map!
- "C-c y" #'youdao-dictionary-search-at-point-tooltip
  "C-c t" #'hl-todo-insert
- )
-
+ "C-c i" #'org-insert-src-block)
 
 ;; custom magit keybinding
 (map! :leader
@@ -166,8 +201,8 @@
    )
   )
 
-;; (use-package! websocket
-;;     :after org-roam)
+(use-package! websocket
+    :after org-roam)
 
 (use-package! org-roam-ui
     :after org-roam ;; or :after org
@@ -228,7 +263,7 @@
         :desc "Six"   "6" 'markdown-insert-atx-6))
 
 
-;; ;; These bindings should probably be after org-noter is loaded.
+;; These bindings should probably be after org-noter is loaded.
 (map! :localleader
       :map (org-mode-map pdf-view-mode-map)
       (:prefix ("o" . "Org")
@@ -275,27 +310,27 @@
   )
 
 (after! pdf-view
- ;; open pdfs scaled to fit page
- (setq-default pdf-view-display-size 'fit-width)
- (add-hook! 'pdf-view-mode-hook (evil-colemak-basics-mode -1))
- ;; automatically annotate highlights
- (setq pdf-annot-activate-created-annotations t
-       pdf-view-resize-factor 1.1)
+  ;; open pdfs scaled to fit page
+  (setq-default pdf-view-display-size 'fit-width)
+  (add-hook! 'pdf-view-mode-hook (evil-colemak-basics-mode -1))
+  ;; automatically annotate highlights
+  (setq pdf-annot-activate-created-annotations t
+        pdf-view-resize-factor 1.1)
   ;; faster motion
-(map!
-  :map pdf-view-mode-map
-  :n "g g"          #'pdf-view-first-page
-  :n "G"            #'pdf-view-last-page
-  :n "N"            #'pdf-view-next-page-command
-  :n "E"            #'pdf-view-previous-page-command
-  :n "e"            #'evil-collection-pdf-view-previous-line-or-previous-page
-  :n "n"            #'evil-collection-pdf-view-next-line-or-next-page
-  :localleader
-  (:prefix "o"
-   (:prefix "n"
-    :desc "Insert" "i" 'org-noter-insert-note
-    ))
-))
+  (map!
+   :map pdf-view-mode-map
+   :n "g g"          #'pdf-view-first-page
+   :n "G"            #'pdf-view-last-page
+   :n "N"            #'pdf-view-next-page-command
+   :n "E"            #'pdf-view-previous-page-command
+   :n "e"            #'evil-collection-pdf-view-previous-line-or-previous-page
+   :n "n"            #'evil-collection-pdf-view-next-line-or-next-page
+   :localleader
+   (:prefix "o"
+    (:prefix "n"
+     :desc "Insert" "i" 'org-noter-insert-note
+     ))
+   ))
 
 ;; I like having the date on my TODO items.
 (setq org-log-done "time"
@@ -326,6 +361,14 @@
       org-hugo-suppress-lastmod-period 43200.0
       org-hugo-export-creator-string "Emacs 28.0.50 (Org mode 9.5 + ox-hugo + song)"
       )
+
+;; pdf tools: too slow performance
+;; REVIEW  https://emacs.stackexchange.com/questions/13314/install-pdf-tools-on-emacs-macosx
+;; (use-package pdf-tools
+;;   :config
+;;   (custom-set-variables
+;;    '(pdf-tools-handle-upgrades nil))    ; Use brew upgrade pdf-tools instead.
+;;   (setq pdf-info-epdfinfo-program "~/.config/epdfinfo"))
 
 ;; view pdf  in dark-mode
 (use-package pdf-view
@@ -394,6 +437,224 @@
     (previous-line 2)
     (org-edit-src-code)))
 
+(setq org-babel-min-lines-for-block-output 0)
+
 ;; ;; using goimports instead gofmt
 ;; (setq! gofmt-command "gofmt")
 ;; ;; REVIEW org capture https://mediaonfire.com/blog/2017_07_21_org_protocol_firefox.html
+(setq org-latex-inputenc-alist '(("utf8" . "utf8x")))
+;; special settings for beamer-pdf and latex-pdf exporters
+(setq org-pandoc-options-for-beamer-pdf '((pdf-engine . "xelatex")))
+(setq org-pandoc-options-for-latex-pdf '((pdf-engine . "xelatex")))
+;; special extensions for markdown_github output
+(setq org-pandoc-format-extensions '(markdown_github+pipe_tables+raw_html))
+
+;; ---------------------------------------------------------------------------------
+;; latex setting: https://www.geneatcg.com/emacs-org-mode-export-to-pdf/#org9a91d10
+(setq org-latex-pdf-process
+      '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+
+
+    (unless (boundp 'org-latex-classes)
+      (setq org-latex-classes nil))
+
+    (add-to-list 'org-latex-classes
+                 '("ethz"
+                   "\\documentclass[a4paper,11pt,titlepage]{memoir}
+    \\usepackage[utf8]{inputenc}
+    \\usepackage[T1]{fontenc}
+    \\usepackage{fixltx2e}
+    \\usepackage{graphicx}
+    \\usepackage{longtable}
+    \\usepackage{float}
+    \\usepackage{wrapfig}
+    \\usepackage{rotating}
+    \\usepackage[normalem]{ulem}
+    \\usepackage{amsmath}
+    \\usepackage{textcomp}
+    \\usepackage{marvosym}
+    \\usepackage{wasysym}
+    \\usepackage{amssymb}
+    \\usepackage{hyperref}
+    \\usepackage{mathpazo}
+    \\usepackage{color}
+    \\usepackage{enumerate}
+    \\definecolor{bg}{rgb}{0.95,0.95,0.95}
+    \\tolerance=1000
+          [NO-DEFAULT-PACKAGES]
+          [PACKAGES]
+          [EXTRA]
+    \\linespread{1.1}
+    \\hypersetup{pdfborder=0 0 0}"
+                   ("\\chapter{%s}" . "\\chapter*{%s}")
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+
+    (add-to-list 'org-latex-classes
+                 '("article"
+                   "\\documentclass[11pt,a4paper]{article}
+    \\usepackage[utf8]{inputenc}
+    \\usepackage[T1]{fontenc}
+    \\usepackage{fixltx2e}
+    \\usepackage{graphicx}
+    \\usepackage{longtable}
+    \\usepackage{float}
+    \\usepackage{wrapfig}
+    \\usepackage{rotating}
+    \\usepackage[normalem]{ulem}
+    \\usepackage{amsmath}
+    \\usepackage{textcomp}
+    \\usepackage{marvosym}
+    \\usepackage{wasysym}
+    \\usepackage{amssymb}
+    \\usepackage{hyperref}
+    \\usepackage{mathpazo}
+    \\usepackage{color}
+    \\usepackage{enumerate}
+    \\definecolor{bg}{rgb}{0.95,0.95,0.95}
+    \\tolerance=1000
+          [NO-DEFAULT-PACKAGES]
+          [PACKAGES]
+          [EXTRA]
+    \\linespread{1.1}
+    \\hypersetup{pdfborder=0 0 0}"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")))
+
+
+    (add-to-list 'org-latex-classes '("ebook"
+                                      "\\documentclass[11pt, oneside]{memoir}
+    \\setstocksize{9in}{6in}
+    \\settrimmedsize{\\stockheight}{\\stockwidth}{*}
+    \\setlrmarginsandblock{2cm}{2cm}{*} % Left and right margin
+    \\setulmarginsandblock{2cm}{2cm}{*} % Upper and lower margin
+    \\checkandfixthelayout
+    % Much more laTeX code omitted
+    "
+                                      ("\\chapter{%s}" . "\\chapter*{%s}")
+                                      ("\\section{%s}" . "\\section*{%s}")
+                                      ("\\subsection{%s}" . "\\subsection*{%s}")))
+
+;; ---------------------------------------------------------------------------------
+(set-language-environment "UTF-8")
+(prefer-coding-system       'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(setq default-buffer-file-coding-system 'utf-8)
+(set-buffer-file-coding-system 'utf-8)
+(set-clipboard-coding-system 'utf-8)
+(set-file-name-coding-system 'utf-8)
+(set-next-selection-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(setq locale-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+;; Whether display the buffer encoding.
+(setq doom-modeline-buffer-encoding t)
+(setq doom-modeline-persp-name t)
+;; Org-Mode导出如何禁用下划线转下标
+(setq org-export-with-sub-superscripts nil)
+
+;; setting the .org file default coding system
+(add-to-list 'file-coding-system-alist '("\\.org" . utf-8) )
+;; TODO: add mu4e for email
+;; ;; Whether display the mu4e notifications. It requires `mu4e-alert' package.
+;; (setq doom-modeline-mu4e nil)
+;; ;; also enable the start of mu4e-alert
+;; (mu4e-alert-enable-mode-line-display)
+
+;; OSX dictionary
+(map!
+ "C-c d s" #'osx-dictionary-search-input
+ "C-c d d" #'osx-dictionary-search-pointer)
+
+(map!
+ "C-c y" #'youdao-dictionary-search-at-point-tooltip
+ "C-c p" #'youdao-dictionary-play-voice-at-point)
+
+
+
+;; ;; REVIEW Reference: https://dotdoom.rgoswami.me/config.html#org8ed0901
+;; From https://github.com/poligen/dotfiles/blob/25785810f9bf98f6eec93e400c686a4ad65ac310/doom.d/config.el
+;; My customized org-download to incorporate flameshot gui Workaround to setup flameshot, which enables annotation.
+;; In flameshot, set filename as "screenshot", and the command as "flameshot gui -p /tmp", so that we always ends up
+;; with /tmp/screenshot.png. Nullify org-download-screenshot-method by setting it to `echo', so that essentially we
+;; are only calling (org-download-image org-download-screenshot-file).
+(defun hz-org-download-screenshot ()
+  "Capture screenshot and insert the resulting file.
+The screenshot tool is determined by `org-download-screenshot-method'."
+  (interactive)
+  (let ((tmp-file "/tmp/screenshot.png"))
+    (delete-file tmp-file)
+    (call-process-shell-command "flameshot gui -p /tmp/")
+    ;; Because flameshot exit immediately, keep polling to check file existence
+    (while (not (file-exists-p tmp-file))
+      (sleep-for 2))
+    (org-download-image tmp-file)))
+
+(use-package! org-download
+  :after org
+  :config
+  (setq-default org-download-image-dir "./images/"
+                ;; org-download-screenshot-method "flameshot gui --raw > %s"
+                org-download-delete-image-after-download t
+                org-download-method 'directory
+                org-download-heading-lvl 1
+                org-download-screenshot-file "/tmp/screenshot.png"
+                )
+  (cond (IS-LINUX (setq-default org-download-screenshot-method "xclip -selection clipboard -t image/png -o > %s"))
+        (IS-MAC (setq-default org-download-screenshot-method "screencapture -i %s"))))
+
+;; (use-package! org-drill
+;;   :after org)
+
+;; ;; NOTE citeproc-org: CSL-based export has recently been merged into Org's master branch  (2021-08-01)
+(after! ox-hugo
+  (use-package! citeproc-org
+    :config
+    (citeproc-org-setup)
+    (setq citeproc-org-org-bib-header "* References\n")
+    )
+  )
+
+(after! citeproc-org
+  (defun hz/min-headline-level ()
+    (--> (org-element-parse-buffer)
+         (org-element-map it 'headline (apply-partially #'org-element-property :level))
+         (or it '(0))
+         (-min it)))
+
+  (defadvice! hz/citeproc-org-render-references (orig &rest args)
+    :around 'citeproc-org-render-references
+    (let* ((minlevel (hz/min-headline-level))
+           (totallevel (max 1 minlevel))
+           (citeproc-org-org-bib-header (concat (make-string totallevel ?*)
+                                                (string-trim-left citeproc-org-org-bib-header "\\**"))))
+      (apply orig args))))
+
+
+;; ;; Misc Highlighting
+;; (use-package! vimrc-mode
+;;   :mode "\\.vimrc\\'")
+
+;; ;; TODO org-noter
+(use-package! org-noter
+  :after (:any org pdf-view)
+  :config
+  (setq
+   ;; The WM can handle splits
+   org-noter-notes-window-location 'other-frame
+   ;; Please stop opening frames
+   org-noter-always-create-frame nil
+   ;; I want to see the whole file
+   org-noter-hide-other nil
+   ;; Everything is relative to the rclone mega
+   org-noter-notes-search-path (list org_notes)
+   )
+  )
