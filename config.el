@@ -575,9 +575,13 @@
  "C-c d d" #'osx-dictionary-search-pointer)
 
 (map!
- "C-c y" #'youdao-dictionary-search-at-point-tooltip
- "C-c p" #'youdao-dictionary-play-voice-at-point)
+ "C-c y y" #'youdao-dictionary-search-at-point-tooltip
+ "C-c y p" #'youdao-dictionary-play-voice-at-point)
 
+;; NOTE disable go lsp format, go lsp will mess up the code
+(setq-hook! 'go-mode-hook +format-with-lsp nil)
+;; using goimports instead of gofmt
+(setq! gofmt-command "goimports")
 
 
 ;; ;; REVIEW Reference: https://dotdoom.rgoswami.me/config.html#org8ed0901
@@ -658,3 +662,4 @@ The screenshot tool is determined by `org-download-screenshot-method'."
    org-noter-notes-search-path (list org_notes)
    )
   )
+
