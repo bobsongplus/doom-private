@@ -52,11 +52,13 @@
 (add-hook! 'lsp-ui-mode-hook #'lsp-ui-doc-mode)
 (after! lsp-ui
   (setq!
-  lsp-ui-doc-position 'top
-  lsp-ui-doc-show-with-mouse t
-  lsp-ui-doc-max-height 20
-  lsp-ui-doc-max-width 200
-  lsp-ui-doc-show-with-cursor t
+   lsp-ui-doc-position 'top
+   lsp-ui-doc-show-with-mouse t
+   lsp-ui-doc-max-height 20
+   lsp-ui-doc-max-width 200
+   lsp-ui-doc-show-with-cursor t
+   lsp-ui-peek-always-show t
+   lsp-ui-sideline-show-hover t
    )
   )
 
@@ -482,7 +484,7 @@
   "Insert a `SRC-CODE-TYPE' type source code block in org-mode."
   (interactive
    (let ((src-code-types
-          '("emacs-lisp" "python" "C" "sh" "java" "js" "clojure" "C++" "css"
+          '("emacs-lisp" "python" "C" "sh" "java" "js" "clojure" "C++" "json"
             "calc" "asymptote" "dot" "gnuplot" "ledger" "lilypond" "mscgen"
             "octave" "oz" "plantuml" "R" "sass" "screen" "sql" "awk" "ditaa"
             "haskell" "latex" "lisp" "matlab" "ocaml" "org" "perl" "ruby"
@@ -1207,3 +1209,9 @@ If nil it defaults to `split-string-default-separators', normally
   ;; persistence of meta values (see respective section in README to
   ;; find out what meta means)
   :hook ((org-roam-db-autosync-mode . vulpea-db-autosync-enable)))
+
+;; Open eshell in split window
+(setq display-buffer-alist '(("\\`\\*e?shell" display-buffer-pop-up-window)))
+
+
+(setq doom-modeline-vcs-max-length 15)
