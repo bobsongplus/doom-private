@@ -93,3 +93,5 @@
 
 (package! vulpea)
 (package! pdf-tools)
+
+(package! pandoc-mode)

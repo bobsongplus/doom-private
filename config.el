@@ -354,6 +354,7 @@
 
 ;; ;; enable word-wrap in C/C++/ObjC/Java
 (add-hook! 'markdown-mode-hook #'+word-wrap-mode)
+
 (add-hook! 'text-mode-hook #'+word-wrap-mode)
 (add-hook! 'tex-mode-hook #'+word-wrap-mode)
 
@@ -497,6 +498,19 @@
     (insert "#+END_SRC\n")
     (previous-line 2)
     (org-edit-src-code)))
+
+(org-babel-do-load-languages
+      'org-babel-load-languages
+      '((emacs-lisp . t)
+        (ruby . t)
+        (go . t)
+        (ditaa . t)
+        (python . t)
+        (sh . t)
+        (abc . t)
+        (latex . t)
+        (plantuml . t)
+        (R . t)))
 
 (setq org-babel-min-lines-for-block-output 0)
 
@@ -1211,7 +1225,40 @@ If nil it defaults to `split-string-default-separators', normally
   :hook ((org-roam-db-autosync-mode . vulpea-db-autosync-enable)))
 
 ;; Open eshell in split window
+;;
 (setq display-buffer-alist '(("\\`\\*e?shell" display-buffer-pop-up-window)))
 
-
+;; Git branch name is partly hidden
 (setq doom-modeline-vcs-max-length 15)
+
+;; lsp mode for nix-mode
+(add-hook! 'nix-mode-hook #'lsp)
+
+;;https://emacsredux.com/blog/2013/03/27/copy-filename-to-the-clipboard/
+(defun er-copy-file-name-to-clipboard ()
+  "Copy the current buffer file name to the clipboard."
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file name '%s' to the clipboard." filename))))
+
+;; TODO markdown convert to pdf
+;; https://www.jianshu.com/p/7f9a9ff053bb
+;; https://pandoc.org/MANUAL.html#templates
+;; https://www.cnblogs.com/airbird/p/11455210.html
+
+(use-package! pandoc-mode
+  :after (markdown-mode org-mode)
+  :hook
+  (markdown-mode org-mode)
+  (pandoc-mode . pandoc-load-default-settings))
+
+
+(defun tinysong/insert-break-line()
+  "Insert a break line at cursor point."
+  (interactive)
+  (insert "-------------------------------------------------------\n \n")
+  (backward-char 1))
