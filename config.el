@@ -1228,6 +1228,7 @@ If nil it defaults to `split-string-default-separators', normally
 ;;
 (setq display-buffer-alist '(("\\`\\*e?shell" display-buffer-pop-up-window)))
 
+(setq org-ditaa-jar-path "~/.config/doom/third-packages/ditaa.jar")
 ;; Git branch name is partly hidden
 (setq doom-modeline-vcs-max-length 15)
 
