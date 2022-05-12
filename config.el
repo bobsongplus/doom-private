@@ -30,7 +30,11 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-palenight)
+;; (setq doom-theme 'doom-palenight)
+;; (setq doom-theme 'doom-dracula)
+;; (setq doom-theme 'doom-material)
+(setq doom-theme 'doom-molokai)
+;; (setq doom-theme 'doom-nord)
 
 ;; modus-vivendi
 ;; doom-challenger-deep
@@ -489,7 +493,7 @@
             "calc" "asymptote" "dot" "gnuplot" "ledger" "lilypond" "mscgen"
             "octave" "oz" "plantuml" "R" "sass" "screen" "sql" "awk" "ditaa"
             "haskell" "latex" "lisp" "matlab" "ocaml" "org" "perl" "ruby"
-            "scheme" "sqlite" "yaml" "go" "dockerfile" "applescript" "nix")))
+            "scheme" "sqlite" "yaml" "go" "dockerfile" "applescript" "nix" "lua")))
      (list (ido-completing-read "Source code type: " src-code-types))))
   (progn
     (newline-and-indent)
@@ -1222,7 +1226,8 @@ If nil it defaults to `split-string-default-separators', normally
   ;; hook into org-roam-db-autosync-mode you wish to enable
   ;; persistence of meta values (see respective section in README to
   ;; find out what meta means)
-  :hook ((org-roam-db-autosync-mode . vulpea-db-autosync-enable)))
+  :config
+  (setq vulpea-db-autosync-mode t))
 
 ;; Open eshell in split window
 ;;
@@ -1263,3 +1268,43 @@ If nil it defaults to `split-string-default-separators', normally
   (interactive)
   (insert "-------------------------------------------------------\n \n")
   (backward-char 1))
+
+(use-package! ox-hugo
+              :ensure t
+              :after ox)
+
+(use-package! ox-hugo
+  :config
+  (setq org-hugo-base-dir "~/Documents/Blog"))
+
+
+(use-package! pangu-spacing
+  :config
+;; "Real insert space between chinese and english"
+  (setq-hook! 'markdown-mode-hook pangu-spacing-real-insert-separtor t)
+  (setq-hook! 'org-mode-hook pangu-spacing-real-insert-separtor t)
+  )
+
+
+;; method0 是英文输入法，method1是中文输入法
+(setq input-switch-method0 "com.apple.keylayout.ABC")
+(setq input-switch-method1 "com.sogou.inputmethod.sogou.pinyin")
+(setq input-switch-is-on nil)
+
+;; 通过运行命令切换输入法
+(defun input-switch-use-method (method)
+  (when input-switch-is-on
+    (shell-command (replace-regexp-in-string "method" method "swim use method"))))
+
+;; 开启或关闭输入法切换
+(defun input-switch-enable () (interactive) (setq input-switch-is-on t))
+(defun input-switch-disable () (interactive) (setq input-switch-is-on nil))
+
+;; 进入insert mode切换第二输入法（中文）
+(add-hook! 'evil-insert-state-entry-hook
+          (lambda () (input-switch-use-method input-switch-method1)))
+;; 退出insert mode切换第一输入法（英文）
+(add-hook! 'evil-insert-state-exit-hook
+          (lambda () (input-switch-use-method input-switch-method0)))
+
+

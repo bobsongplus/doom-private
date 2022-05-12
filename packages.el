@@ -61,6 +61,8 @@
 
 ;; org roam ui just fot roam2
 (package! websocket)
+(unpin! org-roam)
+(package! org-roam)
 (package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
 
 
@@ -95,3 +97,11 @@
 (package! pdf-tools)
 
 (package! pandoc-mode)
+
+(package! protobuf-mode)
+(package! ox-hugo)
+
+;;TODO the notions of a collection. https://github.com/publicimageltd/delve
+(package! delve
+  :recipe (:host github
+           :repo "publicimageltd/delve"))
