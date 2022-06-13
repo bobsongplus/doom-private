@@ -105,3 +105,18 @@
 (package! delve
   :recipe (:host github
            :repo "publicimageltd/delve"))
+
+(package! sis)
+(package! tmux-pane)
+(package! evil-pinyin)
+(package! term-cursor :recipe
+  (:host github :repo "h0d/term-cursor.el"))
+
+(package! vtm :recipe
+  (:host github :repo "laishulu/emacs-vterm-manager"))
+
+
+(package! evil-textobj-column)
+(package! evil-textobj-line)
+(package! evil-textobj-syntax)
+(package! evil-textobj-entire)
