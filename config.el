@@ -80,14 +80,34 @@
 
 
 
-
 (use-package! sis
-  ;; should after doom-theme, or cursor color will not be retained.
-  :after (evil tmux-pane doom-theme)
-  :config
-  (delete "C-h" sis-prefix-override-keys)
-  (sis-global-respect-mode t)
-  (sis-global-inline-mode t)
-  (sis-global-context-mode t)
-  (sis-global-cursor-color-mode t))
+  :hook
+  ;; enable the /follow context/ and /inline region/ mode for specific buffers
+  ((text-mode prog-mode) . sis-context-mode)
+  ((text-mode prog-mode) . sis-inline-mode)
 
+  :config
+
+  (add-hook! 'evil-insert-state-exit-hook #'sis-set-english)
+
+  (setq sis-auto-refresh-seconds 30)
+  ;; For MacOS
+  (sis-ism-lazyman-config
+
+   ;; English input source may be: "ABC", "US" or another one.
+   ;; "com.apple.keylayout.ABC"
+   "com.apple.keylayout.US"
+
+   ;; Other language input source: "rime", "sogou" or another one.
+   ;; "im.rime.inputmethod.Squirrel.Rime"
+   "com.sogou.inputmethod.sogou.pinyin")
+
+  ;; enable the /cursor color/ mode
+  ;; (sis-global-cursor-color-mode t)
+  ;; enable the /respect/ mode
+  ;; (sis-global-respect-mode t)
+  ;; enable the /follow context/ mode for all buffers
+  ;; (sis-global-context-mode t)
+  ;; enable the /inline english/ mode for all buffers
+  ;; (sis-global-inline-mode t)
+  )
