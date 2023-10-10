@@ -18,7 +18,8 @@
      (doom-init-ui-hook)
      (:warning)))
  '(warning-suppress-types
-   '((comp)
+   '((org-element-cache)
+     (comp)
      (comp)
      (comp)
      (comp)

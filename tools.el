@@ -99,3 +99,131 @@ need jq and yq command"
   (interactive)
   (insert "-------------------------------------------------------\n \n")
   (backward-char 1))
+
+;; (use-package! liberime
+;;   :config
+;;   (setq! liberime-module-file "~/.config/doom/third-packages/macos-x86-liberime-core.so"
+;;          ))
+;; (use-package! pyim
+;;   ;; :quelpa (pyim :fetcher github :repo "merrickluo/pyim")
+;;   :init
+;;   (setq pyim-title "R")
+;;   :config
+;;   ;; (use-package pyim-basedict
+;;   ;;   :config
+;;   ;;   (pyim-basedict-enable))
+;;   (global-set-key (kbd "M-j") 'pyim-convert-string-at-point)
+;;   (setq pyim-dcache-auto-update nil)
+;;   (setq default-input-method "pyim")
+;;   ;; 我使用全拼
+;;   (setq pyim-default-scheme 'rime)
+;;   (setq pyim-page-tooltip 'child-frame)
+
+;;   ;; 设置 pyim 探针设置，这是 pyim 高级功能设置，可以实现 *无痛* 中英文切换 :-)
+;;   ;; 我自己使用的中英文动态切换规则是：
+;;   ;; 1. 光标只有在注释里面时，才可以输入中文。
+;;   ;; 2. 光标前是汉字字符时，才能输入中文。
+;;   ;; 3. 使用 M-j 快捷键，强制将光标前的拼音字符串转换为中文。
+;;   (setq-default pyim-english-input-switch-functions
+;; 		        '(pyim-probe-dynamic-english
+;; 		          pyim-probe-isearch-mode
+;; 		          pyim-probe-program-mode
+;;                   pyim-probe-evil-normal-mode
+;; 		          pyim-probe-org-structure-template))
+
+;;   (setq-default pyim-punctuation-half-width-functions
+;; 		        '(pyim-probe-punctuation-line-beginning
+;; 		          pyim-probe-punctuation-after-punctuation)))
+
+(defun +rime-predicate-is-back-quote-or-tilde ()
+  (or (equal rime--current-input-key ?`)
+      (equal rime--current-input-key ?~)))
+
+(defun +rime-inline-predicate()
+  (and (not (or (eq major-mode 'minibuffer-mode) (eq major-mode 'notdeft-mode)))
+       (or (rime-predicate-space-after-cc-p)
+	   (+rime-predicate-is-back-quote-or-tilde)
+	   (rime-predicate-current-uppercase-letter-p))))
+
+(defun +rime-disable-predicate()
+  (and (not (or (eq major-mode 'minibuffer-mode) (eq major-mode 'notdeft-mode)))
+       (or (rime-predicate-prog-in-code-p) (rime-predicate-after-alphabet-char-p)
+	   (meow-normal-mode-p) (meow-motion-mode-p) (meow-keypad-mode-p))))
+
+;; (use-package! rime
+;;   :custom
+;;   (setq default-input-method "rime"
+;;         rime-show-candidate 'popup
+;;         rime-posframe-style 'simple
+;;         rime-popup-style 'simple
+;;         rime-sidewindow-style 'bottom
+;;         rime-sidewindow-keep-window t
+;;         rime-inline-ascii-trigger 'shift-l
+;;         )
+;;   (add-hook! (org-mode
+;;               markdown-mode
+;;               beancount-mode)
+;;     (activate-input-method default-input-method))
+;;   )
+
+(use-package! rime
+  :custom
+  (default-input-method "rime")
+  (rime-emacs-module-header-root "~/development/emacs/nextstep/Emacs.app/Contents/Resources/include/")
+  (rime-librime-root (expand-file-name "third-packages/librime/dist" default-directory))
+  (rime-cursor "˰")
+  (rime-show-candidate 'posframe)
+  ;;https://emacs-china.org/t/doom-emacs-rime/12499/18?u=huos3203
+  ;;  (rime-share-data-dir "/Users/boyer/Library/Rime")
+  ;;  (rime-user-data-dir "/Users/boyer/Library/Rime")
+  (rime-posframe-properties
+   (list :background-color "#073642"
+         :foreground-color "#839496"
+         :internal-border-width 1
+         :font "Input Mono Narrow"
+         ))
+  ;;
+  (rime-disable-predicates '(rime-predicate-evil-mode-p
+                             rime-predicate-after-alphabet-char-p
+                             rime-predicate-prog-in-code-p))
+  ;;; 具体参考 mode-line-mule-info 默认值，其中可能有其它有用信息
+  (mode-line-mule-info '((:eval (rime-lighter))))
+  ;;在 minibuffer 使用后自动关闭输入法
+  (rime-deactivate-when-exit-minibuffer t)
+
+  :config
+  (set-face-attribute 'rime-default-face nil :foreground "#839496" :background "#073642")
+  )
+
+
+
+
+
+(use-package tramp
+  :config
+  (add-to-list 'tramp-default-method-alist
+               '("\\`localhost\\'" "\\`root\\'" "su"))
+
+  ;; Do not connect to root directly to specific hosts, but use user and then
+  ;; su/sudo
+  (add-to-list 'tramp-default-proxies-alist
+               '("192\\.168\\.42\\.3" "\\`root\\'" "/ssh:%h:"))
+
+  ;; Seriously speed things up by setting async usage with tramp
+  ;; https://www.gnu.org/software/tramp/#Improving-performance-of-asynchronous-remote-processes-1
+  (add-to-list 'tramp-connection-properties
+               (list (regexp-quote "/ssh:")
+                     "direct-async-process" t))
+
+  ;; Speed up tramp by reusing connetions
+  (setq tramp-ssh-controlmaster-options
+        (concat
+         "-o ControlPath=~/.ssh-%%r@%%h:%%p "
+         "-o ControlMaster=auto -o ControlPersist=yes"))
+
+
+  (setq tramp-default-host "localhost")
+  (setq tramp-default-method "ssh"))
+
+
+

@@ -948,7 +948,6 @@ If nil it defaults to `split-string-default-separators', normally
   (pandoc-mode . pandoc-load-default-settings))
 
 (use-package! ox-hugo
-  :ensure t
   :after ox
   :config
   (setq org-hugo-base-dir "~/Documents/Blog"))
