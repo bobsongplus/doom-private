@@ -18,3 +18,8 @@
           "--header-insertion=never"
           "--header-insertion-decorators=0"))
   (set-lsp-priority! 'clangd 2))
+
+(after! eglot
+  :config
+  (set-eglot-client! 'cc-mode '("clangd" "-j=3" "--clang-tidy"))
+  )

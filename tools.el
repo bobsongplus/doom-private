@@ -227,3 +227,11 @@ need jq and yq command"
 
 
 
+(after! eglot
+  :config
+  (set-eglot-client! 'cc-mode '("clangd" "-j=3" "--clang-tidy")))
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               `(c++-mode . ("clangd" :initializationOptions
+                             (:compilationDatabasePath "/tmp")))))
