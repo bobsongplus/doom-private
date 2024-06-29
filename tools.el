@@ -62,8 +62,7 @@
     (format "%s" title))
   )
 
-(
- map!
+(map!
  "C-c t" #'hl-todo-insert
  "C-c i" #'org-insert-src-block
  "C-c l l" #'tinysong/insert-chrome-current-tab-url
@@ -71,13 +70,17 @@
  )
 
 ;; OSX dictionary
-(map!
- "C-c d s" #'osx-dictionary-search-input
- "C-c d d" #'osx-dictionary-search-pointer)
+;; Work with popwin-el (https://github.com/m2ym/popwin-el)
+;; (push "*osx-dictionary*" popwin:special-display-config)
+;; (use-package! youdao-dictionary
+;;   (map!
+;;    "C-c d s" #'osx-dictionary-search-input
+;;    "C-c d d" #'osx-dictionary-search-pointer)
 
-(map!
- "C-c y y" #'youdao-dictionary-search-at-point-tooltip
- "C-c y p" #'youdao-dictionary-play-voice-at-point)
+;;   (map!
+;;    "C-c y y" #'youdao-dictionary-search-at-point-tooltip
+;;    "C-c y p" #'youdao-dictionary-play-voice-at-point)
+;;   )
 
 (use-package! password-store)
 
@@ -235,3 +238,40 @@ need jq and yq command"
   (add-to-list 'eglot-server-programs
                `(c++-mode . ("clangd" :initializationOptions
                              (:compilationDatabasePath "/tmp")))))
+
+
+
+(defun insert-random-uuid ()
+  "Insert a UUID.
+This commands calls “uuidgen” on MacOS, Linux, and calls PowelShell on Microsoft Windows.
+URL `http://xahlee.info/emacs/emacs/elisp_generate_uuid.html'
+Version: 2020-06-04 2023-05-13"
+  (interactive)
+  (cond
+   ((eq system-type 'windows-nt)
+    (shell-command "pwsh.exe -Command [guid]::NewGuid().toString()" t))
+   ((eq system-type 'darwin) ; Mac
+    (shell-command "uuidgen" t))
+   ((eq system-type 'gnu/linux)
+    (shell-command "uuidgen" t))
+   (t
+    ;; code here by Christopher Wellons, 2011-11-18.
+    ;; and editted Hideki Saito further to generate all valid variants for "N" in xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx format.
+    (let ((xstr (md5 (format "%s%s%s%s%s%s%s%s%s%s"
+                             (user-uid)
+                             (emacs-pid)
+                             (system-name)
+                             (user-full-name)
+                             (current-time)
+                             (emacs-uptime)
+                             (garbage-collect)
+                             (buffer-string)
+                             (random)
+                             (recent-keys)))))
+      (insert (format "%s-%s-4%s-%s%s-%s"
+                      (substring xstr 0 8)
+                      (substring xstr 8 12)
+                      (substring xstr 13 16)
+                      (format "%x" (+ 8 (random 4)))
+                      (substring xstr 17 20)
+                      (substring xstr 20 32)))))))

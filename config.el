@@ -21,7 +21,7 @@
 (load! "tools")
 (load! "note")
 (load! "language")
-
+(load! "llm")
 
 
 
@@ -103,14 +103,14 @@
 ;;    ;; "com.sogou.inputmethod.sogou.pinyin"
 ;;    )
 
-  ;; enable the /cursor color/ mode
-  ;; (sis-global-cursor-color-mode t)
-  ;; enable the /respect/ mode
-  ;; (sis-global-respect-mode t)
-  ;; enable the /follow context/ mode for all buffers
-  ;; (sis-global-context-mode t)
-  ;; enable the /inline english/ mode for all buffers
-  ;; (sis-global-inline-mode t)
+;; enable the /cursor color/ mode
+;; (sis-global-cursor-color-mode t)
+;; enable the /respect/ mode
+;; (sis-global-respect-mode t)
+;; enable the /follow context/ mode for all buffers
+;; (sis-global-context-mode t)
+;; enable the /inline english/ mode for all buffers
+;; (sis-global-inline-mode t)
 ;;  )
 
 (advice-add 'ispell-lookup-words :around

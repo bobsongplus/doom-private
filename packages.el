@@ -50,7 +50,7 @@
                                         ;(unpin! t)
 
 ;; youdao translate
-(package! youdao-dictionary)
+;; (package! youdao-dictionary)
 (package! osx-dictionary)
 ;; ;; info colors
 (package! info-colors :pin "47ee73cc19b1049eef32c9f3e264ea7ef2aaf8a5")
@@ -126,4 +126,9 @@
 
 ;; Add support for rendering KConfig fragments (from the Linux kernel/Buildroot) nicely.
 (package! kconfig-mode :pin "cd87b71c8c1739d026645ece0bbd20055a7a2d4a")
-(use-package! kconfig-mode)
+
+(package! gptel)
+
+(package! ellama)
+(package! llm :pin "23616e6cf597b2e5be6824b645751ca2b790ba3b")
+

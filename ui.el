@@ -9,7 +9,9 @@
 ;;   presentations or streaming.
 
 (setq doom-unicode-font (font-spec :family "Fira Mono"))
+(setq doom-font (font-spec :size 15 ))
 
+;; (setq doom-font (font-spec :size 13))
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
 ;; (setq doom-font (font-spec :family "monospace" :size 12 :weight 'semi-light)
@@ -21,8 +23,8 @@
 ;; (setq doom-theme 'doom-palenight)
 ;; (setq doom-theme 'doom-dracula)
 ;; (setq doom-theme 'doom-material)
-(setq doom-theme 'doom-molokai)
-;; (setq doom-theme 'doom-nord)
+;; (setq doom-theme 'doom-molokai)
+(setq doom-theme 'doom-nord)
 
 ;; modus-vivendi
 ;; doom-challenger-deep
@@ -78,10 +80,10 @@
       (setq global-mode-string (remove '("" mode-line-keycast " ") global-mode-string))))
   (custom-set-faces!
     '(keycast-command :inherit doom-modeline-debug
-                      :height 0.9)
+      :height 0.9)
     '(keycast-key :inherit custom-modified
-                  :height 1.1
-                  :weight bold))
+      :height 1.1
+      :weight bold))
   (keycast-mode))
 
 ;; language setting

@@ -6,6 +6,9 @@
 ;; using goimports instead of gofmt
 (setq! gofmt-command "goimports")
 
+(add-hook! 'before-save-hook #'lsp-organize-imports)
+(add-hook! 'before-save-hook #'lsp-format-buffer)
+
 ;;  speedups the process of lsp for the first lookup
 (setq! lsp-enable-file-watchers nil)
 
@@ -23,3 +26,5 @@
   :config
   (set-eglot-client! 'cc-mode '("clangd" "-j=3" "--clang-tidy"))
   )
+
+;; (add-hook! 'prog-mode-hook 'flyspell-mode)
