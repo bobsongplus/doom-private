@@ -38,7 +38,6 @@
        doom-quit              ; DOOM quit-message prompts when you quit Emacs
        (emoji +unicode)       ; 🙂
        hl-todo                ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
-       hydra
        indent-guides      ; highlighted indent columns
        ligatures          ; ligatures and symbols to make your code pretty again
        minimap            ; show a map of the code on the side
@@ -104,7 +103,6 @@
        pass                           ; password manager for nerds
        pdf                            ; pdf enhancements
        ;;prodigy           ; FIXME managing external services & code builders
-       rgb                ; creating color strings
        ;;taskrunner        ; taskrunner for all your projects
        terraform                      ; infrastructure as code
        tmux                           ; an API for interacting with tmux
@@ -177,7 +175,12 @@
        ;;php               ; perl's insecure younger brother
        plantuml         ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
-       python           ; beautiful is better than ugly
+       (python
+        +conda
+        +lsp
+        +pyenv
+        +poetry
+        +tree-sitter)    ; beautiful is better than ugly
        ;;qt                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
@@ -195,7 +198,7 @@
        ;;swift             ; who asked for emoji variables?
        ;;terra             ; Earth and Moon in alignment for performance.
        ;;web               ; the tubes
-       (yaml +lsp +tree-sitter)         ; JSON, but readable
+       (yaml +lsp)         ; JSON, but readable
        ;;zig               ; C, but simpler
 
        :email

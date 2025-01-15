@@ -21,6 +21,7 @@
 (load! "tools")
 (load! "note")
 (load! "language")
+(load! "copyright")
 (load! "llm")
 
 

@@ -1,6 +1,8 @@
 ;;; ../../development/dotfiles/.config/doom/git.el -*- lexical-binding: t; -*-
 
 
+(after! magit
+  (setq magit-diff-refine-hunk 'all))
 
 ;; custom magit keybinding
 (map! :leader
@@ -42,3 +44,5 @@
       ("r" "resolve" (lambda () (interactive) (ignore-errors (smerge-resolve)) (smerge-repeatedly)))
       ("k" "kill current" (lambda () (interactive) (ignore-errors (smerge-kill-current)) (smerge-repeatedly)))
       ("q" "quit" (lambda () (interactive) (smerge-auto-leave)))]]))
+
+
