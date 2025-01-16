@@ -29,20 +29,14 @@
   ;;  ;; You shouldn't add ollama providers here - it can be selected interactively
   ;;  ;; without it. It is just example.
   (setq ellama-providers
-        '(("zephyr" . (make-llm-ollama
-                       :chat-model "zephyr:latest"
-                       :embedding-model "zephyr:latest"))
-          ("mistral" . (make-llm-ollama
-                        :chat-model "mistral:latest"
-                        :embedding-model "mistral:latest"))
-          ("mixtral" . (make-llm-ollama
-                        :chat-model "mixtral:8x7b-instruct-v0.1-q3_K_M-4k"
-                        :embedding-model "mixtral:8x7b-instruct-v0.1-q3_K_M-4k"))))
+        '(("qwen" . (make-llm-ollama
+                     :chat-model "qwen2.5-coder:7b"
+                     :embedding-model "qwen2.5-coder:7b"))))
   ;; Naming new sessions with llm
   (setq ellama-naming-provider
         (make-llm-ollama
-         :chat-model "zephyr:latest"
-         :embedding-model "zephyr:latest"
+         :chat-model "qwen2.5-coder:7b"
+         :embedding-model "qwen2.5-coder:7b"
          :default-chat-non-standard-params '(("stop" . ("\n")))))
   (setq ellama-naming-scheme 'ellama-generate-name-by-llm)
   ;;  ;; ;; Translation llm provider
@@ -50,3 +44,14 @@
                                      :chat-model "phi3:14b-medium-128k-instruct-q6_K"
                                      :embedding-model "nomic-embed-text"))
   )
+
+
+;; accept completion from copilot and fallback to company
+;; TODO copilot loging failed: timeout
+;; (use-package! copilot
+;;   :hook (prog-mode . copilot-mode)
+;;   :bind (:map copilot-completion-map
+;;               ("<tab>" . 'copilot-accept-completion)
+;;               ("TAB" . 'copilot-accept-completion)
+;;               ("C-TAB" . 'copilot-accept-completion-by-word)
+;;               ("C-<tab>" . 'copilot-accept-completion-by-word)))

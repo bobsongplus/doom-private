@@ -12,10 +12,11 @@
 
   (defun auto-update-header ()
     (save-excursion
-      (while (search-forward "YEAR" nil t)
+      (while (search-forward "COPYRIGHTYEAR" nil t)
         (replace-match (format-time-string "%Y") nil t))
-      (while (search-forward "AUTHOR" nil t)
-        (replace-match user-full-name nil t))))
-
-  (add-hook 'go-mode-hook 'auto-update-header)
+      (while (search-forward "COPYRIGHTDATE" nil t)
+        (replace-match (format-time-string "%Y-%m-%d") nil t))
+      (while (search-forward "COPYRIGHTAUTHOR" nil t)
+        (replace-match user-full-name nil t)))
+    )
   )

@@ -132,3 +132,6 @@
 (package! ellama)
 (package! llm :pin "23616e6cf597b2e5be6824b645751ca2b790ba3b")
 
+
+(package! copilot
+  :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))

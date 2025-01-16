@@ -20,11 +20,11 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-;; (setq doom-theme 'doom-palenight)
+(setq doom-theme 'doom-palenight)
 ;; (setq doom-theme 'doom-dracula)
 ;; (setq doom-theme 'doom-material)
 ;; (setq doom-theme 'doom-molokai)
-(setq doom-theme 'doom-nord)
+;; (setq doom-theme 'doom-nord)
 
 ;; modus-vivendi
 ;; doom-challenger-deep
